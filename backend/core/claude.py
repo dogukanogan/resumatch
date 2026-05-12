@@ -1,4 +1,4 @@
-from google import genai
+from groq import Groq
 from core.config import settings
 
-client = genai.Client(api_key=settings.gemini_api_key)
+client = Groq(api_key=settings.groq_api_key)

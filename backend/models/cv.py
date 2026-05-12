@@ -4,18 +4,25 @@ from datetime import datetime
 
 
 class Experience(BaseModel):
-    company: str
-    title: str
+    company: Optional[str] = None
+    title: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     description: Optional[str] = None
 
 
 class Education(BaseModel):
-    institution: str
-    degree: str
+    institution: Optional[str] = None
+    degree: Optional[str] = None
     field: Optional[str] = None
     year: Optional[str] = None
+
+
+class Links(BaseModel):
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
+    portfolio: Optional[str] = None
+    other: list[str] = []
 
 
 class ParsedCV(BaseModel):
@@ -26,6 +33,7 @@ class ParsedCV(BaseModel):
     summary: Optional[str] = None
     skills: list[str] = []
     languages: list[str] = []
+    links: Optional[Links] = None
     experience: list[Experience] = []
     education: list[Education] = []
 

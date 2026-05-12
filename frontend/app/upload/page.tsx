@@ -13,6 +13,9 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [dragOver, setDragOver] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const API_URL = "/api"
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -27,22 +30,29 @@ export default function UploadPage() {
     if (!file) return
     setUploading(true)
     setProgress(20)
+    setError(null)
 
     const formData = new FormData()
     formData.append("file", file)
 
     try {
       setProgress(50)
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cv/upload`, {
+      const res = await fetch(`${API_URL}/upload`, {
         method: "POST",
         body: formData,
       })
       setProgress(90)
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.detail ?? `Server error: ${res.status}`)
+      }
       const data = await res.json()
       setProgress(100)
+      localStorage.setItem("cv_result", JSON.stringify(data))
       router.push("/dashboard")
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
+      setError(err.message ?? "Upload failed. Make sure the backend is running.")
     } finally {
       setUploading(false)
     }
@@ -88,6 +98,12 @@ export default function UploadPage() {
           </div>
 
           {uploading && <Progress value={progress} className="h-2" />}
+
+          {error && (
+            <p className="text-red-400 text-sm bg-red-950/30 border border-red-800 rounded-lg px-4 py-3">
+              {error}
+            </p>
+          )}
 
           <Button
             onClick={handleUpload}
