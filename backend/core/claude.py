@@ -1,4 +1,4 @@
-import anthropic
+from google import genai
 from core.config import settings
 
-client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+client = genai.Client(api_key=settings.gemini_api_key)

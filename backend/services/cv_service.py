@@ -15,13 +15,8 @@ class CVService:
             doc = docx.Document(BytesIO(content))
             return "\n".join(p.text for p in doc.paragraphs)
 
-    async def parse_with_claude(self, text: str) -> ParsedCV:
-        response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2000,
-            messages=[{
-                "role": "user",
-                "content": f"""Extract structured information from this CV text and return ONLY valid JSON.
+    async def parse_with_ai(self, text: str) -> ParsedCV:
+        prompt = f"""Extract structured information from this CV text and return ONLY valid JSON.
 
 CV Text:
 {text}
@@ -38,10 +33,12 @@ Return JSON with this exact structure:
   "experience": [{{"company": "", "title": "", "start_date": "", "end_date": "", "description": ""}}],
   "education": [{{"institution": "", "degree": "", "field": "", "year": ""}}]
 }}"""
-            }]
-        )
 
-        raw = response.content[0].text.strip()
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+        raw = response.text.strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -51,7 +48,7 @@ Return JSON with this exact structure:
 
     async def process_cv(self, content: bytes, filename: str, content_type: str) -> dict:
         text = await self.extract_text(content, content_type)
-        parsed = await self.parse_with_claude(text)
+        parsed = await self.parse_with_ai(text)
         return {
             "filename": filename,
             "parsed": parsed.model_dump(),
