@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { buttonVariants } from "@/components/ui/button"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export default function DashboardPage() {
   return (
@@ -13,9 +12,9 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
             <p className="text-slate-400 mt-1">Your CV analysis and job matches</p>
           </div>
-          <Button asChild className="bg-indigo-600 hover:bg-indigo-500">
-            <Link href="/upload">Upload New CV</Link>
-          </Button>
+          <Link href="/upload" className={cn(buttonVariants(), "bg-indigo-600 hover:bg-indigo-500")}>
+            Upload New CV
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -43,9 +42,9 @@ export default function DashboardPage() {
           <CardContent>
             <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
               <p className="text-slate-500">No CV uploaded yet.</p>
-              <Button asChild variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-                <Link href="/upload">Upload your first CV</Link>
-              </Button>
+              <Link href="/upload" className={cn(buttonVariants({ variant: "outline" }), "border-slate-600 text-slate-300 hover:bg-slate-800")}>
+                Upload your first CV
+              </Link>
             </div>
           </CardContent>
         </Card>

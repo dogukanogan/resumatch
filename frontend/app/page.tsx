@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 export default function Home() {
   return (
@@ -20,12 +21,12 @@ export default function Home() {
         </div>
 
         <div className="flex gap-4 justify-center flex-wrap">
-          <Button size="lg" asChild className="bg-indigo-600 hover:bg-indigo-500">
-            <Link href="/upload">Upload Your CV</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild className="border-slate-600 text-slate-300 hover:bg-slate-800">
-            <Link href="/dashboard">View Dashboard</Link>
-          </Button>
+          <Link href="/upload" className={cn(buttonVariants({ size: "lg" }), "bg-indigo-600 hover:bg-indigo-500")}>
+            Upload Your CV
+          </Link>
+          <Link href="/dashboard" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "border-slate-600 text-slate-300 hover:bg-slate-800")}>
+            View Dashboard
+          </Link>
         </div>
 
         <div className="grid grid-cols-3 gap-6 pt-8 text-center">
