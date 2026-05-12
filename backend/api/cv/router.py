@@ -15,6 +15,11 @@ async def upload_cv(file: UploadFile = File(...)):
     return result
 
 
+@router.get("/")
+async def list_cvs():
+    return await cv_service.list_cvs()
+
+
 @router.get("/{cv_id}")
 async def get_cv(cv_id: str):
     cv = await cv_service.get_cv(cv_id)

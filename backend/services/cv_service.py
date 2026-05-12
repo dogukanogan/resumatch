@@ -3,6 +3,7 @@ import PyPDF2
 import docx
 from io import BytesIO
 from core.claude import client
+from core.supabase import supabase
 from models.cv import ParsedCV
 
 
@@ -51,14 +52,38 @@ Return JSON with this exact structure:
         data = json.loads(raw)
         return ParsedCV(**data)
 
+    async def save_to_db(self, filename: str, parsed: ParsedCV, raw_text: str) -> dict:
+        row = {
+            "filename": filename,
+            "parsed_cv": parsed.model_dump(),
+            "raw_text": raw_text[:2000],
+        }
+        result = supabase.table("profiles").insert(row).execute()
+        return result.data[0]
+
     async def process_cv(self, content: bytes, filename: str, content_type: str) -> dict:
         text = await self.extract_text(content, content_type)
         parsed = await self.parse_with_ai(text)
+        saved = await self.save_to_db(filename, parsed, text)
         return {
+            "id": saved["id"],
             "filename": filename,
             "parsed": parsed.model_dump(),
-            "raw_text": text[:500]
+            "created_at": saved["created_at"],
         }
 
     async def get_cv(self, cv_id: str) -> dict | None:
-        return None
+        result = supabase.table("profiles").select("*").eq("id", cv_id).execute()
+        if not result.data:
+            return None
+        row = result.data[0]
+        return {
+            "id": row["id"],
+            "filename": row["filename"],
+            "parsed": row["parsed_cv"],
+            "created_at": row["created_at"],
+        }
+
+    async def list_cvs(self) -> list:
+        result = supabase.table("profiles").select("id, filename, cv_score, created_at").order("created_at", desc=True).execute()
+        return result.data
